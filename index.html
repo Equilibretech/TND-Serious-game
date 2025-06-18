@@ -1,0 +1,2743 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parcours TND - Les Clés de l'Inclusion</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --warning-color: #ff9800;
+            --info-color: #2196f3;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Écran d'accueil */
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            color: white;
+        }
+
+        .welcome-screen h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-in;
+        }
+
+        .welcome-screen p {
+            font-size: 1.3em;
+            margin-bottom: 40px;
+            opacity: 0.9;
+            animation: fadeIn 1.5s ease-in;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: fadeIn 2s ease-in;
+        }
+
+        .start-btn, .secondary-btn {
+            background: white;
+            color: var(--primary-color);
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .secondary-btn {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .start-btn:hover, .secondary-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .secondary-btn:hover {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        /* Navigation */
+        .navbar {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .nav-items {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .player-level {
+            background: var(--secondary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .score {
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: #e0e0e0;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .badges {
+            display: flex;
+            gap: 10px;
+        }
+
+        .badge {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .badge.unlocked {
+            background: gold;
+            animation: bounce 0.5s;
+        }
+
+        .badge-tooltip {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .badge:hover .badge-tooltip {
+            opacity: 1;
+        }
+
+        /* Modules */
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .module-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card:hover:not(.disabled) {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .module-card.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .module-card.completed {
+            border: 3px solid var(--success-color);
+        }
+
+        .module-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .module-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .module-card p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .coming-soon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--error-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+        }
+
+        .completed-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--success-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: #e0e0e0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--success-color);
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .achievements-list {
+            margin-top: 30px;
+        }
+
+        .achievement {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+        }
+
+        .achievement:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .achievement-icon {
+            font-size: 2em;
+        }
+
+        .achievement-info h4 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .achievement-info p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        /* Jeu Maison */
+        .house-game {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            position: relative;
+        }
+
+        .house-3d {
+            perspective: 1000px;
+            margin: 20px auto;
+            max-width: 800px;
+        }
+
+        .room-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .room {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .room:hover {
+            background: #e8eaf6;
+            transform: scale(1.05) rotateY(5deg);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .room.visited {
+            border: 3px solid var(--success-color);
+        }
+
+        .room-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .room h4 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .room p {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .room-info {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: var(--error-color);
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8em;
+            animation: pulse 2s infinite;
+        }
+
+        /* Mini-jeu adaptation */
+        .adaptation-game {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .scenario-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .scenario-counter {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .scenario-progress-bar {
+            background: #e0e0e0;
+            height: 10px;
+            width: 200px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .scenario-progress-fill {
+            background: var(--success-color);
+            height: 100%;
+            width: 20%;
+            transition: width 0.5s;
+        }
+
+        .timer {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #666;
+        }
+
+        .scenario-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            animation: slideIn 0.5s ease-out;
+            position: relative;
+        }
+
+        .scenario-character {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .character-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+
+        .character-info h4 {
+            color: var(--primary-color);
+            margin-bottom: 3px;
+        }
+
+        .character-info p {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .choices {
+            display: grid;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .choice {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: rgba(102, 126, 234, 0.1);
+            transition: width 0.3s;
+        }
+
+        .choice:hover:not(.disabled)::before {
+            width: 100%;
+        }
+
+        .choice:hover:not(.disabled) {
+            border-color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .choice.disabled {
+            cursor: default;
+            opacity: 0.8;
+        }
+
+        .choice.correct {
+            border-color: var(--success-color);
+            background: #e8f5e9;
+        }
+
+        .choice.incorrect {
+            border-color: var(--error-color);
+            background: #ffebee;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .feedback.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .feedback.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* Jeu Café des Parents */
+        .cafe-game {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .conversation-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .conversation-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .conversation-box::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 30px;
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 10px solid #f8f9fa;
+        }
+
+        .speaker {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .speaker-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+        }
+
+        .speaker-name {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .response-options {
+            display: grid;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Atelier des Solutions */
+        .workshop-game {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .tool-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            text-align: center;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            background: #e8eaf6;
+        }
+
+        .tool-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .tool-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .tool-card p {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .tool-category {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--info-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+        }
+
+        .tool-details {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+            text-align: left;
+        }
+
+        .tool-details ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tool-details li {
+            padding: 5px 0;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .tool-details li:before {
+            content: '✓ ';
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        /* Quiz rapide */
+        .quick-quiz {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .quiz-timer {
+            font-size: 2em;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .quiz-question {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .quiz-question h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .quiz-option {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        .quiz-results {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .quiz-score {
+            font-size: 3em;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        /* Ressources */
+        .resources {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .resources-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            background: #e0e0e0;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .resources-content {
+            display: grid;
+            gap: 15px;
+        }
+
+        .resource-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .resource-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .resource-info h4 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .resource-info p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .download-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .download-btn:hover {
+            background: var(--secondary-color);
+            transform: scale(1.1);
+        }
+
+        /* Popup d'information */
+        .info-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: popIn 0.3s;
+        }
+
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .popup-header h3 {
+            color: var(--primary-color);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .popup-content {
+            line-height: 1.6;
+        }
+
+        .popup-content ul {
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+
+        .popup-content li {
+            margin: 10px 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a5fcf;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        /* Notification Toast */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            z-index: 2000;
+            animation: slideInRight 0.5s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 350px;
+        }
+
+        .notification.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .notification.info {
+            border-left: 4px solid var(--info-color);
+        }
+
+        .notification.warning {
+            border-left: 4px solid var(--warning-color);
+        }
+
+        /* Overlay */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes popIn {
+            from { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .welcome-screen h1 { font-size: 2em; }
+            .room-container { grid-template-columns: 1fr; }
+            .nav-items { flex-direction: column; gap: 15px; }
+            .quiz-options { grid-template-columns: 1fr; }
+            .tools-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Mode sombre */
+        .dark-mode {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .dark-mode .navbar,
+        .dark-mode .module-card,
+        .dark-mode .house-game,
+        .dark-mode .adaptation-game,
+        .dark-mode .cafe-game,
+        .dark-mode .workshop-game,
+        .dark-mode .dashboard,
+        .dark-mode .resources,
+        .dark-mode .quick-quiz,
+        .dark-mode .info-popup {
+            background: #2a2a2a;
+            color: white;
+        }
+
+        .dark-mode .room,
+        .dark-mode .stat-card,
+        .dark-mode .scenario-box,
+        .dark-mode .conversation-box,
+        .dark-mode .tool-card,
+        .dark-mode .achievement,
+        .dark-mode .resource-item {
+            background: #3a3a3a;
+        }
+
+        .dark-mode .choice,
+        .dark-mode .quiz-option {
+            background: #3a3a3a;
+            border-color: #4a4a4a;
+        }
+
+        .dark-mode .btn-secondary,
+        .dark-mode .nav-btn,
+        .dark-mode .tab {
+            background: #4a4a4a;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Écran d'accueil -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <h1>🎮 Parcours TND</h1>
+            <p>Les Clés de l'Inclusion</p>
+            <p style="font-size: 1em; max-width: 600px;">
+                Découvrez les Troubles du Neurodéveloppement à travers une expérience 
+                interactive et bienveillante. Développez vos compétences d'accompagnement 
+                et devenez acteur de l'inclusion !
+            </p>
+            <div class="button-group">
+                <button class="start-btn" onclick="startGame()">Commencer l'aventure</button>
+                <button class="secondary-btn" onclick="showQuickQuiz()">Quiz rapide</button>
+            </div>
+            
+            <!-- Bouton caché pour les infos de développement (coin inférieur droit) -->
+            <div style="position: fixed; bottom: 10px; right: 10px; width: 50px; height: 50px; cursor: pointer;" onclick="showDevInfo()" title="Zone secrète"></div>
+        </div>
+
+        <!-- Barre de navigation -->
+        <nav class="navbar" id="navbar">
+            <div class="nav-items">
+                <div class="player-info">
+                    <h3>Bienvenue, Formateur·rice !</h3>
+                    <div class="player-level">
+                        <span>Niveau <span id="playerLevel">1</span></span>
+                        <span style="font-size: 0.8em;">⭐</span>
+                    </div>
+                    <div class="score">Score: <span id="score">0</span> XP</div>
+                </div>
+                <div class="nav-buttons">
+                    <button class="nav-btn" onclick="showDashboard()">📊 Tableau de bord</button>
+                    <button class="nav-btn" onclick="showResources()">📚 Ressources</button>
+                    <button class="nav-btn" onclick="toggleDarkMode()">🌙</button>
+                </div>
+                <div class="badges">
+                    <div class="badge" id="badge1">
+                        🌟
+                        <span class="badge-tooltip">Observateur attentif</span>
+                    </div>
+                    <div class="badge" id="badge2">
+                        🤝
+                        <span class="badge-tooltip">Médiateur bienveillant</span>
+                    </div>
+                    <div class="badge" id="badge3">
+                        🛠️
+                        <span class="badge-tooltip">Architecte de l'inclusion</span>
+                    </div>
+                    <div class="badge" id="badge4">
+                        💡
+                        <span class="badge-tooltip">Innovateur pédagogique</span>
+                    </div>
+                    <div class="badge" id="badge5">
+                        🎯
+                        <span class="badge-tooltip">Expert en inclusion</span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Grille des modules -->
+        <div class="module-grid" id="moduleGrid">
+            <div class="module-card" onclick="openHouseGame()">
+                <div class="module-icon">🏠</div>
+                <h3>La Maison des Découvertes</h3>
+                <p>Explorez les différents TND à travers une maison interactive</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="houseProgress"></div>
+                </div>
+            </div>
+            
+            <div class="module-card" onclick="openAdaptationGame()">
+                <div class="module-icon">🎒</div>
+                <h3>L'École Inclusive</h3>
+                <p>Apprenez à adapter votre classe pour tous les élèves</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="schoolProgress"></div>
+                </div>
+            </div>
+            
+            <div class="module-card" onclick="openCafeGame()">
+                <div class="module-icon">☕</div>
+                <h3>Le Café des Parents</h3>
+                <p>Échangez et déconstruisez les préjugés</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="cafeProgress"></div>
+                </div>
+            </div>
+            
+            <div class="module-card" onclick="openWorkshop()">
+                <div class="module-icon">🛠️</div>
+                <h3>L'Atelier des Solutions</h3>
+                <p>Découvrez votre boîte à outils inclusive</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="workshopProgress"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tableau de bord -->
+        <div class="dashboard" id="dashboard">
+            <h2>📊 Tableau de bord</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalScore">0</div>
+                    <div class="stat-label">Points XP</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="modulesCompleted">0/4</div>
+                    <div class="stat-label">Modules complétés</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="badgesUnlocked">0/5</div>
+                    <div class="stat-label">Badges débloqués</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="timeSpent">0h</div>
+                    <div class="stat-label">Temps de jeu</div>
+                </div>
+            </div>
+
+            <div class="achievements-list">
+                <h3>🏆 Accomplissements</h3>
+                <div id="achievementsList"></div>
+            </div>
+
+            <button class="btn btn-secondary" onclick="backToModules()" style="margin-top: 20px;">
+                Retour aux modules
+            </button>
+        </div>
+
+        <!-- Jeu Maison des Découvertes -->
+        <div class="house-game" id="houseGame">
+            <h2>🏠 La Maison des Découvertes</h2>
+            <p>Chaque pièce représente un trouble du neurodéveloppement. Cliquez pour explorer !</p>
+            
+            <div class="house-3d">
+                <div class="room-container">
+                    <div class="room" id="room-tsa" onclick="showRoomInfo('tsa')">
+                        <div class="room-icon">🛋️</div>
+                        <h4>Salon</h4>
+                        <p>TSA</p>
+                        <span class="room-info" id="info-tsa">!</span>
+                    </div>
+                    
+                    <div class="room" id="room-tdah" onclick="showRoomInfo('tdah')">
+                        <div class="room-icon">🍳</div>
+                        <h4>Cuisine</h4>
+                        <p>TDAH</p>
+                        <span class="room-info" id="info-tdah">!</span>
+                    </div>
+                    
+                    <div class="room" id="room-dys" onclick="showRoomInfo('dys')">
+                        <div class="room-icon">📚</div>
+                        <h4>Bureau</h4>
+                        <p>Troubles DYS</p>
+                        <span class="room-info" id="info-dys">!</span>
+                    </div>
+                    
+                    <div class="room" id="room-di" onclick="showRoomInfo('di')">
+                        <div class="room-icon">🛏️</div>
+                        <h4>Chambre</h4>
+                        <p>Déficience intellectuelle</p>
+                        <span class="room-info" id="info-di">!</span>
+                    </div>
+                    
+                    <div class="room" id="room-moteur" onclick="showRoomInfo('moteur')">
+                        <div class="room-icon">🌳</div>
+                        <h4>Jardin</h4>
+                        <p>Troubles moteurs</p>
+                        <span class="room-info" id="info-moteur">!</span>
+                    </div>
+
+                    <div class="room" id="room-communication" onclick="showRoomInfo('communication')">
+                        <div class="room-icon">💬</div>
+                        <h4>Salle de jeux</h4>
+                        <p>Troubles de la communication</p>
+                        <span class="room-info" id="info-communication">!</span>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn btn-secondary" onclick="backToModules()" style="margin-top: 20px;">
+                Retour aux modules
+            </button>
+        </div>
+
+        <!-- Mini-jeu adaptation -->
+        <div class="adaptation-game" id="adaptationGame">
+            <h2>🎒 L'École Inclusive - Scénarios d'adaptation</h2>
+            
+            <div class="scenario-header">
+                <div class="scenario-counter">Scénario <span id="currentScenario">1</span>/5</div>
+                <div class="scenario-progress-bar">
+                    <div class="scenario-progress-fill" id="scenarioProgress"></div>
+                </div>
+                <div class="timer">
+                    <span>⏱️</span>
+                    <span id="scenarioTimer">--:--</span>
+                </div>
+            </div>
+            
+            <div class="scenario-box" id="scenarioBox">
+                <div class="scenario-character">
+                    <div class="character-avatar">👧</div>
+                    <div class="character-info">
+                        <h4 id="characterName">Emma</h4>
+                        <p id="characterAge">8 ans</p>
+                    </div>
+                </div>
+                <h3>Situation :</h3>
+                <p id="scenarioText"></p>
+            </div>
+            
+            <div class="choices" id="choicesContainer"></div>
+            
+            <div class="feedback" id="feedback"></div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-primary" id="nextScenarioBtn" onclick="nextScenario()" style="display: none;">
+                    Scénario suivant →
+                </button>
+                <button class="btn btn-secondary" onclick="backToModules()">
+                    Retour aux modules
+                </button>
+            </div>
+        </div>
+
+        <!-- Jeu Café des Parents -->
+        <div class="cafe-game" id="cafeGame">
+            <h2>☕ Le Café des Parents</h2>
+            <p>Participez à des conversations constructives pour déconstruire les préjugés</p>
+            
+            <div class="conversation-container" id="conversationContainer">
+                <div class="conversation-box">
+                    <div class="speaker">
+                        <div class="speaker-avatar">👤</div>
+                        <div class="speaker-name" id="speakerName">Parent inquiet</div>
+                    </div>
+                    <p id="parentQuestion">"Mon enfant va avoir un élève autiste dans sa classe. J'ai peur que cela perturbe son apprentissage..."</p>
+                </div>
+                
+                <div class="response-options" id="responseOptions"></div>
+            </div>
+            
+            <div class="feedback" id="cafeFeedback"></div>
+            
+            <button class="btn btn-secondary" onclick="backToModules()" style="margin-top: 20px;">
+                Retour aux modules
+            </button>
+        </div>
+
+        <!-- Atelier des Solutions -->
+        <div class="workshop-game" id="workshopGame">
+            <h2>🛠️ L'Atelier des Solutions</h2>
+            <p>Explorez votre boîte à outils pour créer un environnement inclusif</p>
+            
+            <div class="tools-grid" id="toolsGrid">
+                <div class="tool-card" onclick="toggleToolDetails(this)">
+                    <span class="tool-category">Sensoriel</span>
+                    <div class="tool-icon">🎧</div>
+                    <h4>Casque anti-bruit</h4>
+                    <p>Réduit les stimuli sonores pour les élèves hypersensibles</p>
+                    <div class="tool-details">
+                        <ul>
+                            <li>Idéal pour les élèves avec TSA ou TDAH</li>
+                            <li>Permet la concentration dans un environnement bruyant</li>
+                            <li>Disponible en différentes tailles et couleurs</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="tool-card" onclick="toggleToolDetails(this)">
+                    <span class="tool-category">Organisation</span>
+                    <div class="tool-icon">⏰</div>
+                    <h4>Time Timer</h4>
+                    <p>Visualisation du temps qui passe pour structurer les activités</p>
+                    <div class="tool-details">
+                        <ul>
+                            <li>Représentation visuelle du temps restant</li>
+                            <li>Aide à la gestion du temps et des transitions</li>
+                            <li>Réduit l'anxiété liée au temps</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="tool-card" onclick="toggleToolDetails(this)">
+                    <span class="tool-category">Motricité</span>
+                    <div class="tool-icon">🪑</div>
+                    <h4>Coussin d'équilibre</h4>
+                    <p>Permet le mouvement tout en restant assis</p>
+                    <div class="tool-details">
+                        <ul>
+                            <li>Favorise la concentration pour les élèves TDAH</li>
+                            <li>Améliore la posture et l'équilibre</li>
+                            <li>Stimulation proprioceptive douce</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="tool-card" onclick="toggleToolDetails(this)">
+                    <span class="tool-category">Communication</span>
+                    <div class="tool-icon">🖼️</div>
+                    <h4>Pictogrammes</h4>
+                    <p>Support visuel pour la communication et l'organisation</p>
+                    <div class="tool-details">
+                        <ul>
+                            <li>Facilite la compréhension des consignes</li>
+                            <li>Aide à structurer la journée</li>
+                            <li>Support pour les élèves non-verbaux</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-secondary" onclick="backToModules()" style="margin-top: 20px;">
+                Retour aux modules
+            </button>
+        </div>
+
+        <!-- Ressources -->
+        <div class="resources" id="resources">
+            <h2>📚 Centre de Ressources</h2>
+            
+            <div class="resources-tabs">
+                <button class="tab active" onclick="showResourceTab('guides')">Guides</button>
+                <button class="tab" onclick="showResourceTab('videos')">Vidéos</button>
+                <button class="tab" onclick="showResourceTab('outils')">Outils</button>
+                <button class="tab" onclick="showResourceTab('liens')">Liens utiles</button>
+            </div>
+
+            <div class="resources-content" id="resourcesContent">
+                <div class="resource-item">
+                    <div class="resource-info">
+                        <h4>Guide de l'inclusion scolaire</h4>
+                        <p>Document complet sur les adaptations pédagogiques</p>
+                    </div>
+                    <button class="download-btn" onclick="downloadResource('guide-inclusion')">
+                        📥 Télécharger
+                    </button>
+                </div>
+                
+                <div class="resource-item">
+                    <div class="resource-info">
+                        <h4>Fiches pratiques TSA</h4>
+                        <p>10 fiches d'adaptation pour les élèves avec TSA</p>
+                    </div>
+                    <button class="download-btn" onclick="downloadResource('fiches-tsa')">
+                        📥 Télécharger
+                    </button>
+                </div>
+                
+                <div class="resource-item">
+                    <div class="resource-info">
+                        <h4>Boîte à outils TDAH</h4>
+                        <p>Stratégies et outils pour accompagner les élèves TDAH</p>
+                    </div>
+                    <button class="download-btn" onclick="downloadResource('outils-tdah')">
+                        📥 Télécharger
+                    </button>
+                </div>
+            </div>
+
+            <button class="btn btn-secondary" onclick="backToModules()" style="margin-top: 20px;">
+                Retour aux modules
+            </button>
+        </div>
+
+        <!-- Quiz rapide -->
+        <div class="quick-quiz" id="quickQuiz">
+            <div class="quiz-header">
+                <h2>⚡ Quiz Rapide TND</h2>
+                <div class="quiz-timer" id="quizTimer">30</div>
+            </div>
+
+            <div class="quiz-question" id="quizQuestion">
+                <h3 id="questionText">Quel trouble se caractérise par des difficultés de coordination motrice ?</h3>
+                <div class="quiz-options" id="quizOptions">
+                    <div class="quiz-option" onclick="checkQuizAnswer(this, false)">TDAH</div>
+                    <div class="quiz-option" onclick="checkQuizAnswer(this, true)">Dyspraxie</div>
+                    <div class="quiz-option" onclick="checkQuizAnswer(this, false)">Dyslexie</div>
+                    <div class="quiz-option" onclick="checkQuizAnswer(this, false)">TSA</div>
+                </div>
+            </div>
+
+            <div class="quiz-results" id="quizResults">
+                <h2>Résultats du Quiz</h2>
+                <div class="quiz-score" id="quizScore">0/10</div>
+                <p id="quizMessage"></p>
+                <button class="btn btn-primary" onclick="restartQuiz()">Rejouer</button>
+                <button class="btn btn-secondary" onclick="startGame()">Retour au jeu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup d'information -->
+    <div class="overlay" id="overlay" onclick="closePopup()"></div>
+    <div class="info-popup" id="infoPopup">
+        <div class="popup-header">
+            <h3 id="popupTitle"></h3>
+            <button class="close-btn" onclick="closePopup()">×</button>
+        </div>
+        <div class="popup-content" id="popupContent"></div>
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="completeRoom()">J'ai compris !</button>
+            <button class="btn btn-secondary" onclick="closePopup()">Fermer</button>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let score = 0;
+        let level = 1;
+        let roomsVisited = [];
+        let currentRoom = '';
+        let unlockedBadges = [];
+        let currentScenarioIndex = 0;
+        let scenariosCompleted = 0;
+        let correctAnswersCount = 0;
+        let answeredCurrentQuestion = false;
+        let cafeScenarioIndex = 0;
+        let quizCurrentQuestion = 0;
+        let quizScore = 0;
+        let quizTimer = null;
+        let gameStartTime = Date.now();
+        let completedModules = [];
+        let toolsDiscovered = [];
+
+        // Sauvegarde locale
+        function saveProgress() {
+            const gameData = {
+                score,
+                level,
+                roomsVisited,
+                unlockedBadges,
+                completedModules,
+                toolsDiscovered,
+                gameStartTime
+            };
+            localStorage.setItem('tndGameProgress', JSON.stringify(gameData));
+        }
+
+        function loadProgress() {
+            const savedData = localStorage.getItem('tndGameProgress');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                score = data.score || 0;
+                level = data.level || 1;
+                roomsVisited = data.roomsVisited || [];
+                unlockedBadges = data.unlockedBadges || [];
+                completedModules = data.completedModules || [];
+                toolsDiscovered = data.toolsDiscovered || [];
+                gameStartTime = data.gameStartTime || Date.now();
+                
+                // Mettre à jour l'interface
+                updateUI();
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('playerLevel').textContent = level;
+            
+            // Mettre à jour les badges
+            unlockedBadges.forEach(badgeId => {
+                document.getElementById(badgeId).classList.add('unlocked');
+            });
+            
+            // Mettre à jour les progressions
+            if (roomsVisited.length > 0) {
+                document.getElementById('houseProgress').style.width = (roomsVisited.length / 6 * 100) + '%';
+            }
+            
+            // Marquer les modules complétés
+            completedModules.forEach(module => {
+                const moduleCard = document.querySelector(`[onclick*="${module}"]`);
+                if (moduleCard && moduleCard.classList.contains('module-card')) {
+                    moduleCard.classList.add('completed');
+                    if (!moduleCard.querySelector('.completed-badge')) {
+                        const badge = document.createElement('span');
+                        badge.className = 'completed-badge';
+                        badge.textContent = '✓';
+                        moduleCard.appendChild(badge);
+                    }
+                }
+            });
+        }
+
+        // Scénarios du module École Inclusive
+        const scenarios = [
+            {
+                name: "Emma",
+                age: "8 ans",
+                avatar: "👧",
+                situation: "Emma, 8 ans, est dyslexique. Elle doit lire un texte devant la classe. Comment adaptez-vous cette activité pour qu'elle puisse participer sereinement ?",
+                choices: [
+                    {
+                        text: "Lui demander de lire comme les autres élèves, cela l'aidera à progresser",
+                        correct: false,
+                        feedback: "Cette approche risque de mettre Emma en difficulté et de créer de l'anxiété."
+                    },
+                    {
+                        text: "Lui fournir le texte à l'avance avec une police adaptée (Arial 14) et un interligne augmenté",
+                        correct: true,
+                        feedback: "Excellent ! Cette adaptation permet à Emma de se préparer et facilite sa lecture."
+                    },
+                    {
+                        text: "L'exempter de l'exercice pour lui éviter du stress",
+                        correct: false,
+                        feedback: "L'exclusion n'est pas une solution. Il faut adapter, non exclure."
+                    },
+                    {
+                        text: "Proposer une lecture en binôme avec un camarade volontaire qui peut l'aider si besoin",
+                        correct: true,
+                        feedback: "Très bien ! Cette solution favorise l'entraide et l'inclusion."
+                    }
+                ]
+            },
+            {
+                name: "Théo",
+                age: "10 ans", 
+                avatar: "👦",
+                situation: "Théo, 10 ans, a un TDAH. Pendant un exercice de mathématiques de 30 minutes, il montre des signes d'agitation. Quelle(s) stratégie(s) adoptez-vous ?",
+                choices: [
+                    {
+                        text: "Lui demander de se calmer et de se concentrer davantage",
+                        correct: false,
+                        feedback: "Le TDAH n'est pas un manque de volonté. Cette approche est inefficace et culpabilisante."
+                    },
+                    {
+                        text: "Découper l'exercice en 3 séquences de 10 minutes avec des micro-pauses actives",
+                        correct: true,
+                        feedback: "Parfait ! Le découpage et les pauses actives aident à maintenir l'attention."
+                    },
+                    {
+                        text: "L'isoler du groupe pour qu'il ne dérange pas les autres",
+                        correct: false,
+                        feedback: "L'isolement peut stigmatiser et n'aide pas à développer les compétences sociales."
+                    },
+                    {
+                        text: "Lui permettre d'utiliser un fidget ou un coussin d'équilibre pendant le travail",
+                        correct: true,
+                        feedback: "Excellente idée ! Ces outils peuvent aider à canaliser l'hyperactivité."
+                    }
+                ]
+            },
+            {
+                name: "Léa",
+                age: "11 ans",
+                avatar: "👧",
+                situation: "Léa, 11 ans, présente un TSA. C'est la rentrée et elle doit s'adapter à un nouvel emploi du temps. Comment facilitez-vous cette transition ?",
+                choices: [
+                    {
+                        text: "Lui expliquer que les changements font partie de la vie et qu'elle doit s'adapter",
+                        correct: false,
+                        feedback: "Cette approche ne tient pas compte des besoins spécifiques liés au TSA."
+                    },
+                    {
+                        text: "Créer un emploi du temps visuel avec des pictogrammes et le lui présenter avant la rentrée",
+                        correct: true,
+                        feedback: "Excellent ! La prévisibilité et les supports visuels sont essentiels pour les élèves TSA."
+                    },
+                    {
+                        text: "Attendre le jour de la rentrée pour lui expliquer le nouvel emploi du temps",
+                        correct: false,
+                        feedback: "Les changements soudains peuvent être très anxiogènes pour un élève TSA."
+                    },
+                    {
+                        text: "Organiser une visite de l'école avant la rentrée avec présentation des nouveaux espaces",
+                        correct: true,
+                        feedback: "Très bien ! L'anticipation et la familiarisation réduisent l'anxiété."
+                    }
+                ]
+            },
+            {
+                name: "Mathis",
+                age: "9 ans",
+                avatar: "👦",
+                situation: "Mathis, 9 ans, a une dyspraxie. La classe doit réaliser une activité de découpage et collage. Comment adaptez-vous l'activité ?",
+                choices: [
+                    {
+                        text: "Lui donner les mêmes ciseaux que les autres pour qu'il s'entraîne",
+                        correct: false,
+                        feedback: "Sans adaptation, l'activité risque d'être frustrante et décourageante."
+                    },
+                    {
+                        text: "Faire l'activité à sa place pour lui éviter la frustration",
+                        correct: false,
+                        feedback: "Faire à la place de l'élève ne développe pas son autonomie."
+                    },
+                    {
+                        text: "Proposer des ciseaux adaptés et des formes pré-découpées qu'il peut finaliser",
+                        correct: true,
+                        feedback: "Parfait ! Cette adaptation permet à Mathis de participer tout en respectant ses capacités."
+                    },
+                    {
+                        text: "Autoriser l'utilisation de gommettes ou d'éléments pré-découpés comme alternative",
+                        correct: true,
+                        feedback: "Excellente alternative ! L'important est d'atteindre l'objectif pédagogique, pas la méthode."
+                    }
+                ]
+            },
+            {
+                name: "Sarah",
+                age: "12 ans",
+                avatar: "👧",
+                situation: "Sarah, 12 ans, a une déficience intellectuelle légère. La classe travaille sur un projet de recherche. Comment l'incluez-vous efficacement ?",
+                choices: [
+                    {
+                        text: "Lui donner un projet différent et plus simple à faire seule",
+                        correct: false,
+                        feedback: "Cette approche isole Sarah du groupe et limite les interactions sociales."
+                    },
+                    {
+                        text: "L'intégrer à un groupe en définissant un rôle adapté (illustratrice, recherche d'images...)",
+                        correct: true,
+                        feedback: "Excellent ! Chacun contribue selon ses capacités dans un projet commun."
+                    },
+                    {
+                        text: "Demander aux autres élèves de faire le travail pour elle",
+                        correct: false,
+                        feedback: "Cette approche ne valorise pas les capacités de Sarah et peut créer du ressentiment."
+                    },
+                    {
+                        text: "Adapter les objectifs d'apprentissage tout en maintenant sa participation au groupe",
+                        correct: true,
+                        feedback: "Très bien ! L'adaptation des objectifs permet une vraie inclusion."
+                    }
+                ]
+            }
+        ];
+
+        // Scénarios Café des Parents
+        const cafeScenarios = [
+            {
+                speaker: "Parent inquiet",
+                avatar: "👤",
+                question: "Mon enfant va avoir un élève autiste dans sa classe. J'ai peur que cela perturbe son apprentissage...",
+                responses: [
+                    {
+                        text: "Je comprends vos inquiétudes. Saviez-vous que la présence d'élèves avec TSA peut enrichir l'expérience de tous ? Les élèves développent plus d'empathie et de compétences sociales.",
+                        correct: true,
+                        feedback: "Excellente réponse ! Vous transformez l'inquiétude en opportunité d'apprentissage."
+                    },
+                    {
+                        text: "Ne vous inquiétez pas, l'élève autiste sera probablement isolé du groupe pour ne pas déranger.",
+                        correct: false,
+                        feedback: "Cette réponse renforce la stigmatisation. L'inclusion bénéficie à tous."
+                    },
+                    {
+                        text: "Les adaptations mises en place bénéficient souvent à tous les élèves. Un environnement structuré et prévisible aide chacun à mieux apprendre.",
+                        correct: true,
+                        feedback: "Très bien ! Vous montrez que l'inclusion est un atout pour tous."
+                    },
+                    {
+                        text: "C'est vrai que c'est compliqué, mais on n'a pas le choix avec la loi sur l'inclusion.",
+                        correct: false,
+                        feedback: "Cette approche défensive ne favorise pas l'adhésion. Il vaut mieux mettre en avant les bénéfices."
+                    }
+                ]
+            },
+            {
+                speaker: "Maman préoccupée",
+                avatar: "👩",
+                question: "Mon fils est dyslexique et il rentre en CE2. J'ai peur qu'il prenne du retard par rapport aux autres...",
+                responses: [
+                    {
+                        text: "La dyslexie n'est pas un frein à la réussite. Avec les bonnes adaptations, votre fils peut progresser à son rythme tout en atteignant les objectifs.",
+                        correct: true,
+                        feedback: "Réponse rassurante et constructive qui valorise le potentiel de l'enfant."
+                    },
+                    {
+                        text: "Il faudra accepter qu'il ait des difficultés et peut-être envisager une orientation spécialisée.",
+                        correct: false,
+                        feedback: "Cette réponse est décourageante et ne propose pas de solutions inclusives."
+                    },
+                    {
+                        text: "Nous travaillerons ensemble pour mettre en place des outils adaptés : police spéciale, temps supplémentaire, oral privilégié. Votre fils a toutes ses chances !",
+                        correct: true,
+                        feedback: "Excellent ! Vous proposez des solutions concrètes et rassurez le parent."
+                    },
+                    {
+                        text: "Beaucoup de dyslexiques réussissent très bien, regardez Einstein !",
+                        correct: false,
+                        feedback: "Bien que positif, cet exemple crée une pression. Chaque enfant a son propre parcours."
+                    }
+                ]
+            },
+            {
+                speaker: "Papa sceptique",
+                avatar: "👨",
+                question: "Le TDAH, c'est juste des enfants mal élevés, non ? De mon temps, on savait se tenir !",
+                responses: [
+                    {
+                        text: "Le TDAH est un trouble neurologique reconnu, pas un problème d'éducation. Le cerveau traite l'information différemment, ce qui affecte l'attention et l'impulsivité.",
+                        correct: true,
+                        feedback: "Réponse éducative qui informe sans juger les préconceptions du parent."
+                    },
+                    {
+                        text: "Vous avez tort ! C'est un vrai trouble et ce n'est pas la faute des parents !",
+                        correct: false,
+                        feedback: "Cette réponse confrontante risque de braquer le parent au lieu de l'éduquer."
+                    },
+                    {
+                        text: "Je comprends votre point de vue. Les recherches en neurosciences nous montrent aujourd'hui que c'est plus complexe. Voulez-vous que je vous explique ?",
+                        correct: true,
+                        feedback: "Parfait ! Vous validez son ressenti tout en ouvrant la porte à l'éducation."
+                    },
+                    {
+                        text: "C'est vrai que certains enfants sont juste agités, mais le TDAH c'est différent.",
+                        correct: false,
+                        feedback: "Cette réponse ambiguë peut renforcer les préjugés au lieu de les déconstruire."
+                    }
+                ]
+            }
+        ];
+
+        // Questions Quiz Rapide
+        const quizQuestions = [
+            {
+                question: "Quel trouble se caractérise par des difficultés de coordination motrice ?",
+                options: ["TDAH", "Dyspraxie", "Dyslexie", "TSA"],
+                correct: 1
+            },
+            {
+                question: "Que signifie TSA ?",
+                options: ["Trouble Sévère de l'Attention", "Trouble du Spectre de l'Autisme", "Trouble Sensoriel Aigu", "Trouble Social Adaptatif"],
+                correct: 1
+            },
+            {
+                question: "Quel outil peut aider un élève TDAH à rester concentré ?",
+                options: ["Un livre", "Un coussin d'équilibre", "Des lunettes", "Un stylo spécial"],
+                correct: 1
+            },
+            {
+                question: "La dyslexie affecte principalement :",
+                options: ["La motricité", "La lecture", "L'audition", "Le comportement"],
+                correct: 1
+            },
+            {
+                question: "Pour un élève avec TSA, il est important de :",
+                options: ["Changer souvent les routines", "Maintenir un environnement prévisible", "Éviter les supports visuels", "L'isoler des autres"],
+                correct: 1
+            }
+        ];
+
+        // Données des troubles
+        const roomData = {
+            tsa: {
+                title: "Trouble du Spectre de l'Autisme (TSA)",
+                content: `
+                    <h4>Qu'est-ce que le TSA ?</h4>
+                    <p>Le TSA se caractérise par des particularités dans la communication sociale 
+                    et des comportements répétitifs ou intérêts restreints.</p>
+                    
+                    <h4>Signes à observer :</h4>
+                    <ul>
+                        <li>Difficultés dans les interactions sociales</li>
+                        <li>Particularités sensorielles (hyper ou hyposensibilité)</li>
+                        <li>Besoin de routines et prévisibilité</li>
+                        <li>Intérêts spécifiques intenses</li>
+                    </ul>
+                    
+                    <h4>Adaptations possibles :</h4>
+                    <ul>
+                        <li>Structurer l'environnement et le temps</li>
+                        <li>Utiliser des supports visuels</li>
+                        <li>Respecter les besoins sensoriels</li>
+                        <li>Valoriser les intérêts spécifiques</li>
+                    </ul>
+                    
+                    <h4>💡 Astuce inclusive :</h4>
+                    <p><em>Les élèves avec TSA ont souvent des compétences exceptionnelles dans leurs domaines d'intérêt. Utilisez ces passions comme levier d'apprentissage !</em></p>
+                `
+            },
+            tdah: {
+                title: "Trouble Déficit de l'Attention avec/sans Hyperactivité (TDAH)",
+                content: `
+                    <h4>Qu'est-ce que le TDAH ?</h4>
+                    <p>Le TDAH se manifeste par des difficultés d'attention, une hyperactivité 
+                    et/ou une impulsivité qui impactent le quotidien.</p>
+                    
+                    <h4>Signes à observer :</h4>
+                    <ul>
+                        <li>Difficulté à maintenir l'attention</li>
+                        <li>Agitation motrice fréquente</li>
+                        <li>Impulsivité dans les actions et paroles</li>
+                        <li>Organisation difficile</li>
+                    </ul>
+                    
+                    <h4>Adaptations possibles :</h4>
+                    <ul>
+                        <li>Découper les tâches en étapes courtes</li>
+                        <li>Permettre des pauses actives</li>
+                        <li>Utiliser des outils d'organisation (timer, planning)</li>
+                        <li>Placer l'élève loin des distractions</li>
+                    </ul>
+                    
+                    <h4>💡 Astuce inclusive :</h4>
+                    <p><em>Le mouvement aide à la concentration ! Autorisez l'utilisation de balles anti-stress ou de coussins d'équilibre.</em></p>
+                `
+            },
+            dys: {
+                title: "Les Troubles DYS",
+                content: `
+                    <h4>Que sont les troubles DYS ?</h4>
+                    <p>Les troubles DYS regroupent la dyslexie, dyspraxie, dyscalculie, 
+                    dysorthographie, dysgraphie et dysphasie.</p>
+                    
+                    <h4>Manifestations principales :</h4>
+                    <ul>
+                        <li><strong>Dyslexie :</strong> Difficultés de lecture</li>
+                        <li><strong>Dyspraxie :</strong> Troubles de la coordination</li>
+                        <li><strong>Dyscalculie :</strong> Difficultés en mathématiques</li>
+                        <li><strong>Dysorthographie :</strong> Troubles de l'orthographe</li>
+                        <li><strong>Dysgraphie :</strong> Difficultés d'écriture</li>
+                        <li><strong>Dysphasie :</strong> Troubles du langage oral</li>
+                    </ul>
+                    
+                    <h4>Adaptations possibles :</h4>
+                    <ul>
+                        <li>Adapter les supports (police, interligne)</li>
+                        <li>Autoriser les outils compensatoires</li>
+                        <li>Réduire la quantité d'écrit</li>
+                        <li>Privilégier l'oral pour l'évaluation</li>
+                    </ul>
+                    
+                    <h4>💡 Astuce inclusive :</h4>
+                    <p><em>La police OpenDyslexic et un interligne de 1.5 peuvent faire une grande différence !</em></p>
+                `
+            },
+            di: {
+                title: "Déficience Intellectuelle",
+                content: `
+                    <h4>Qu'est-ce que la déficience intellectuelle ?</h4>
+                    <p>Elle se caractérise par des limitations significatives du fonctionnement 
+                    intellectuel et du comportement adaptatif.</p>
+                    
+                    <h4>Points d'attention :</h4>
+                    <ul>
+                        <li>Rythme d'apprentissage différent</li>
+                        <li>Besoin de répétition et consolidation</li>
+                        <li>Importance du concret et de la manipulation</li>
+                        <li>Développement de l'autonomie</li>
+                    </ul>
+                    
+                    <h4>Adaptations possibles :</h4>
+                    <ul>
+                        <li>Simplifier les consignes</li>
+                        <li>Utiliser des supports visuels</li>
+                        <li>Proposer des activités concrètes</li>
+                        <li>Adapter les objectifs d'apprentissage</li>
+                    </ul>
+                    
+                    <h4>💡 Astuce inclusive :</h4>
+                    <p><em>Valorisez chaque progrès, même petit. La confiance en soi est essentielle pour apprendre !</em></p>
+                `
+            },
+            moteur: {
+                title: "Troubles du Développement Moteur",
+                content: `
+                    <h4>Que sont les troubles moteurs ?</h4>
+                    <p>Ils incluent les troubles de la coordination motrice, les paralysies 
+                    cérébrales et autres atteintes motrices.</p>
+                    
+                    <h4>Impacts possibles :</h4>
+                    <ul>
+                        <li>Difficultés de déplacement</li>
+                        <li>Troubles de la motricité fine</li>
+                        <li>Fatigabilité accrue</li>
+                        <li>Besoin d'aides techniques</li>
+                    </ul>
+                    
+                    <h4>Adaptations possibles :</h4>
+                    <ul>
+                        <li>Aménager l'espace physique</li>
+                        <li>Adapter le matériel scolaire</li>
+                        <li>Permettre l'utilisation d'outils numériques</li>
+                        <li>Prévoir des temps de repos</li>
+                    </ul>
+                    
+                    <h4>💡 Astuce inclusive :</h4>
+                    <p><em>L'accessibilité physique bénéficie à tous : parents avec poussettes, élèves blessés temporairement...</em></p>
+                `
+            },
+            communication: {
+                title: "Troubles de la Communication",
+                content: `
+                    <h4>Que sont les troubles de la communication ?</h4>
+                    <p>Ils regroupent les difficultés de langage oral, de compréhension et d'expression.</p>
+                    
+                    <h4>Manifestations :</h4>
+                    <ul>
+                        <li>Retard de langage</li>
+                        <li>Difficultés de prononciation</li>
+                        <li>Troubles de la compréhension</li>
+                        <li>Communication non-verbale</li>
+                    </ul>
+                    
+                    <h4>Adaptations possibles :</h4>
+                    <ul>
+                        <li>Utiliser la Communication Alternative et Augmentée (CAA)</li>
+                        <li>Supports visuels et gestuels</li>
+                        <li>Temps supplémentaire pour s'exprimer</li>
+                        <li>Reformulation et vérification de la compréhension</li>
+                    </ul>
+                    
+                    <h4>💡 Astuce inclusive :</h4>
+                    <p><em>Les pictogrammes et les gestes peuvent aider tous les élèves à mieux comprendre !</em></p>
+                `
+            }
+        };
+
+        // Fonctions du jeu
+        function startGame() {
+            loadProgress();
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('quickQuiz').style.display = 'none';
+            document.getElementById('navbar').style.display = 'block';
+            document.getElementById('moduleGrid').style.display = 'grid';
+            if (score === 0) {
+                updateScore(50);
+                showNotification('🎮 Bienvenue dans le Parcours TND !', 'info');
+            }
+        }
+
+        function showDashboard() {
+            hideAllSections();
+            document.getElementById('dashboard').style.display = 'block';
+            updateDashboardStats();
+        }
+
+        function updateDashboardStats() {
+            document.getElementById('totalScore').textContent = score;
+            document.getElementById('modulesCompleted').textContent = completedModules.length + '/4';
+            document.getElementById('badgesUnlocked').textContent = unlockedBadges.length + '/5';
+            
+            const timeSpent = Math.floor((Date.now() - gameStartTime) / 1000 / 60);
+            document.getElementById('timeSpent').textContent = timeSpent < 60 ? timeSpent + 'min' : Math.floor(timeSpent / 60) + 'h';
+            
+            // Afficher les accomplissements
+            const achievementsList = document.getElementById('achievementsList');
+            achievementsList.innerHTML = '';
+            
+            const achievements = [
+                { icon: '🏠', title: 'Explorateur', desc: 'Visitez toutes les pièces de la maison', unlocked: roomsVisited.length >= 6 },
+                { icon: '🎒', title: 'Pédagogue inclusif', desc: 'Complétez tous les scénarios scolaires', unlocked: completedModules.includes('openAdaptationGame') },
+                { icon: '☕', title: 'Médiateur', desc: 'Participez au Café des Parents', unlocked: completedModules.includes('openCafeGame') },
+                { icon: '🛠️', title: 'Bricoleur inclusif', desc: 'Découvrez tous les outils', unlocked: toolsDiscovered.length >= 4 },
+                { icon: '🏆', title: 'Expert TND', desc: 'Atteignez le niveau 5', unlocked: level >= 5 }
+            ];
+            
+            achievements.forEach(ach => {
+                const div = document.createElement('div');
+                div.className = 'achievement' + (ach.unlocked ? '' : ' locked');
+                div.innerHTML = `
+                    <div class="achievement-icon">${ach.icon}</div>
+                    <div class="achievement-info">
+                        <h4>${ach.title}</h4>
+                        <p>${ach.desc}</p>
+                    </div>
+                `;
+                achievementsList.appendChild(div);
+            });
+        }
+
+        function showResources() {
+            hideAllSections();
+            document.getElementById('resources').style.display = 'block';
+        }
+
+        function showResourceTab(tab) {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const content = document.getElementById('resourcesContent');
+            content.innerHTML = '';
+            
+            const resources = {
+                guides: [
+                    { title: 'Guide de l\'inclusion scolaire', desc: 'Document complet sur les adaptations pédagogiques' },
+                    { title: 'Fiches pratiques TSA', desc: '10 fiches d\'adaptation pour les élèves avec TSA' },
+                    { title: 'Boîte à outils TDAH', desc: 'Stratégies et outils pour accompagner les élèves TDAH' }
+                ],
+                videos: [
+                    { title: 'Comprendre les TND', desc: 'Vidéo de 15 minutes sur les troubles du neurodéveloppement' },
+                    { title: 'Témoignages d\'inclusion', desc: 'Parents et enseignants partagent leurs expériences' },
+                    { title: 'Aménagements en classe', desc: 'Exemples concrets d\'adaptations réussies' }
+                ],
+                outils: [
+                    { title: 'Générateur de pictogrammes', desc: 'Créez vos supports visuels personnalisés' },
+                    { title: 'Timer visuel', desc: 'Application pour structurer le temps' },
+                    { title: 'Police OpenDyslexic', desc: 'Police adaptée pour les élèves dyslexiques' }
+                ],
+                liens: [
+                    { title: 'Site du Ministère', desc: 'Ressources officielles sur l\'école inclusive' },
+                    { title: 'Association TND', desc: 'Informations et soutien aux familles' },
+                    { title: 'Forum enseignants', desc: 'Échangez avec d\'autres professionnels' }
+                ]
+            };
+            
+            resources[tab].forEach(res => {
+                const div = document.createElement('div');
+                div.className = 'resource-item';
+                div.innerHTML = `
+                    <div class="resource-info">
+                        <h4>${res.title}</h4>
+                        <p>${res.desc}</p>
+                    </div>
+                    <button class="download-btn" onclick="downloadResource('${res.title}')">
+                        ${tab === 'liens' ? '🔗 Visiter' : '📥 Télécharger'}
+                    </button>
+                `;
+                content.appendChild(div);
+            });
+        }
+
+        function downloadResource(resource) {
+            showNotification(`📥 Téléchargement de "${resource}" simulé`, 'success');
+            updateScore(10);
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            event.target.textContent = isDark ? '☀️' : '🌙';
+            showNotification(isDark ? '🌙 Mode sombre activé' : '☀️ Mode clair activé', 'info');
+        }
+
+        function hideAllSections() {
+            const sections = ['moduleGrid', 'houseGame', 'adaptationGame', 'cafeGame', 'workshopGame', 'dashboard', 'resources', 'quickQuiz'];
+            sections.forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+        }
+
+        function openHouseGame() {
+            hideAllSections();
+            document.getElementById('houseGame').style.display = 'block';
+        }
+
+        function openAdaptationGame() {
+            hideAllSections();
+            document.getElementById('adaptationGame').style.display = 'block';
+            currentScenarioIndex = 0;
+            scenariosCompleted = 0;
+            correctAnswersCount = 0;
+            loadScenario(0);
+            startScenarioTimer();
+        }
+
+        function openCafeGame() {
+            hideAllSections();
+            document.getElementById('cafeGame').style.display = 'block';
+            cafeScenarioIndex = 0;
+            loadCafeScenario();
+        }
+
+        function openWorkshop() {
+            hideAllSections();
+            document.getElementById('workshopGame').style.display = 'block';
+        }
+
+        function toggleToolDetails(element) {
+            const details = element.querySelector('.tool-details');
+            const isVisible = details.style.display === 'block';
+            
+            // Fermer tous les autres détails
+            document.querySelectorAll('.tool-details').forEach(d => {
+                d.style.display = 'none';
+            });
+            
+            details.style.display = isVisible ? 'none' : 'block';
+            
+            if (!isVisible) {
+                const toolName = element.querySelector('h4').textContent;
+                if (!toolsDiscovered.includes(toolName)) {
+                    toolsDiscovered.push(toolName);
+                    updateScore(50);
+                    
+                    if (toolsDiscovered.length >= 4) {
+                        document.getElementById('workshopProgress').style.width = '100%';
+                        if (!completedModules.includes('openWorkshop')) {
+                            completedModules.push('openWorkshop');
+                            showNotification('🎉 Module Atelier complété !', 'success');
+                            unlockBadge('badge5');
+                        }
+                    } else {
+                        document.getElementById('workshopProgress').style.width = (toolsDiscovered.length / 4 * 100) + '%';
+                    }
+                    
+                    saveProgress();
+                }
+            }
+        }
+
+        function loadCafeScenario() {
+            if (cafeScenarioIndex >= cafeScenarios.length) {
+                completeCafeModule();
+                return;
+            }
+            
+            const scenario = cafeScenarios[cafeScenarioIndex];
+            document.getElementById('speakerName').textContent = scenario.speaker;
+            document.querySelector('.speaker-avatar').textContent = scenario.avatar;
+            document.getElementById('parentQuestion').textContent = scenario.question;
+            
+            const responseOptions = document.getElementById('responseOptions');
+            responseOptions.innerHTML = '';
+            
+            scenario.responses.forEach((response, i) => {
+                const div = document.createElement('div');
+                div.className = 'choice';
+                div.innerHTML = response.text;
+                div.onclick = function() { handleParentResponse(this, response.correct, response.feedback); };
+                responseOptions.appendChild(div);
+            });
+            
+            document.getElementById('cafeFeedback').style.display = 'none';
+        }
+
+        function handleParentResponse(element, isCorrect, feedback) {
+            const choices = document.querySelectorAll('#responseOptions .choice');
+            choices.forEach(c => c.classList.add('disabled'));
+            
+            if (isCorrect) {
+                element.classList.add('correct');
+                updateScore(200);
+                showCafeFeedback(true, feedback);
+            } else {
+                element.classList.add('incorrect');
+                showCafeFeedback(false, feedback);
+            }
+            
+            setTimeout(() => {
+                cafeScenarioIndex++;
+                if (cafeScenarioIndex < cafeScenarios.length) {
+                    setTimeout(() => {
+                        choices.forEach(c => {
+                            c.classList.remove('correct', 'incorrect', 'disabled');
+                        });
+                        loadCafeScenario();
+                    }, 1000);
+                } else {
+                    completeCafeModule();
+                }
+            }, 2500);
+        }
+
+        function completeCafeModule() {
+            document.getElementById('cafeProgress').style.width = '100%';
+            
+            if (!completedModules.includes('openCafeGame')) {
+                completedModules.push('openCafeGame');
+                
+                if (!unlockedBadges.includes('badge4')) {
+                    unlockBadge('badge4');
+                    showNotification('🎉 Badge débloqué : Innovateur pédagogique !', 'success');
+                }
+                
+                showCafeFeedback(true, '🏆 Félicitations ! Vous avez brillamment géré toutes les conversations. Vous êtes un ambassadeur de l\'inclusion !');
+                
+                setTimeout(() => {
+                    backToModules();
+                }, 4000);
+            }
+            
+            saveProgress();
+        }
+
+        function startScenarioTimer() {
+            let seconds = 0;
+            const timerElement = document.getElementById('scenarioTimer');
+            
+            if (window.scenarioTimer) clearInterval(window.scenarioTimer);
+            
+            window.scenarioTimer = setInterval(() => {
+                seconds++;
+                const minutes = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function loadScenario(index) {
+            answeredCurrentQuestion = false;
+            const scenario = scenarios[index];
+            
+            // Mettre à jour les infos du personnage
+            document.getElementById('characterName').textContent = scenario.name;
+            document.getElementById('characterAge').textContent = scenario.age;
+            document.querySelector('.character-avatar').textContent = scenario.avatar;
+            
+            document.getElementById('currentScenario').textContent = index + 1;
+            document.getElementById('scenarioProgress').style.width = ((index + 1) / scenarios.length * 100) + '%';
+            
+            // Animation de transition
+            const scenarioBox = document.getElementById('scenarioBox');
+            scenarioBox.style.animation = 'none';
+            setTimeout(() => {
+                scenarioBox.style.animation = 'slideIn 0.5s ease-out';
+                document.getElementById('scenarioText').textContent = scenario.situation;
+            }, 10);
+            
+            // Charger les choix
+            const choicesContainer = document.getElementById('choicesContainer');
+            choicesContainer.innerHTML = '';
+            
+            scenario.choices.forEach((choice, i) => {
+                const choiceDiv = document.createElement('div');
+                choiceDiv.className = 'choice';
+                choiceDiv.setAttribute('data-index', i);
+                choiceDiv.innerHTML = `<strong>Option ${String.fromCharCode(65 + i)} :</strong> ${choice.text}`;
+                choiceDiv.onclick = function() { 
+                    if (!answeredCurrentQuestion) {
+                        checkAnswer(this, choice.correct, choice.feedback);
+                    }
+                };
+                choicesContainer.appendChild(choiceDiv);
+            });
+            
+            // Réinitialiser le feedback et le bouton
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('nextScenarioBtn').style.display = 'none';
+        }
+
+        function backToModules() {
+            hideAllSections();
+            document.getElementById('moduleGrid').style.display = 'grid';
+            
+            // Réinitialiser les feedbacks
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('cafeFeedback').style.display = 'none';
+            
+            // Arrêter le timer
+            if (window.scenarioTimer) {
+                clearInterval(window.scenarioTimer);
+                document.getElementById('scenarioTimer').textContent = '--:--';
+            }
+            
+            saveProgress();
+        }
+
+        function showRoomInfo(room) {
+            currentRoom = room;
+            const data = roomData[room];
+            document.getElementById('popupTitle').textContent = data.title;
+            document.getElementById('popupContent').innerHTML = data.content;
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('infoPopup').style.display = 'block';
+            
+            // S'assurer que les boutons sont corrects
+            const actionButtons = document.querySelector('.action-buttons');
+            actionButtons.innerHTML = `
+                <button class="btn btn-primary" onclick="completeRoom()">J'ai compris !</button>
+                <button class="btn btn-secondary" onclick="closePopup()">Fermer</button>
+            `;
+        }
+
+        function closePopup() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('infoPopup').style.display = 'none';
+        }
+
+        function completeRoom() {
+            if (!roomsVisited.includes(currentRoom)) {
+                roomsVisited.push(currentRoom);
+                updateScore(100);
+                
+                // Marquer la pièce comme visitée
+                document.getElementById('room-' + currentRoom).classList.add('visited');
+                
+                // Mettre à jour la progression
+                const progress = (roomsVisited.length / 6) * 100;
+                document.getElementById('houseProgress').style.width = progress + '%';
+                
+                // Retirer l'indicateur de nouvelle info
+                const infoIcon = document.getElementById('info-' + currentRoom);
+                if (infoIcon) infoIcon.style.display = 'none';
+                
+                // Débloquer badge et compléter module si toutes les pièces visitées
+                if (roomsVisited.length === 6) {
+                    if (!completedModules.includes('openHouseGame')) {
+                        completedModules.push('openHouseGame');
+                        unlockBadge('badge1');
+                        showNotification('🎉 Badge débloqué : Observateur attentif !', 'success');
+                        showNotification('🏠 Module Maison des Découvertes complété !', 'success');
+                    }
+                }
+                
+                saveProgress();
+            }
+            closePopup();
+        }
+
+        function checkAnswer(element, isCorrect, feedbackText) {
+            if (answeredCurrentQuestion) return;
+            
+            answeredCurrentQuestion = true;
+            
+            // Désactiver tous les choix
+            const choices = document.querySelectorAll('.choice');
+            choices.forEach(c => {
+                c.classList.add('disabled');
+            });
+            
+            // Marquer la réponse sélectionnée
+            if (isCorrect) {
+                element.classList.add('correct');
+                updateScore(150);
+                correctAnswersCount++;
+                showFeedback(true, "✓ " + feedbackText);
+            } else {
+                element.classList.add('incorrect');
+                showFeedback(false, "✗ " + feedbackText);
+            }
+            
+            // Montrer toutes les bonnes réponses après un délai
+            setTimeout(() => {
+                const scenario = scenarios[currentScenarioIndex];
+                const choiceElements = document.querySelectorAll('.choice');
+                
+                choiceElements.forEach((choiceElement) => {
+                    const index = parseInt(choiceElement.getAttribute('data-index'));
+                    if (scenario.choices[index].correct) {
+                        choiceElement.classList.add('correct');
+                    }
+                });
+                
+                // Afficher le bouton suivant
+                if (currentScenarioIndex < scenarios.length - 1) {
+                    document.getElementById('nextScenarioBtn').style.display = 'inline-block';
+                } else {
+                    // Fin du module
+                    setTimeout(() => {
+                        completeSchoolModule();
+                    }, 2000);
+                }
+            }, 1500);
+        }
+
+        function nextScenario() {
+            // Réinitialiser les classes des choix
+            const choices = document.querySelectorAll('.choice');
+            choices.forEach(c => {
+                c.classList.remove('correct', 'incorrect', 'disabled');
+            });
+            
+            currentScenarioIndex++;
+            loadScenario(currentScenarioIndex);
+        }
+
+        function completeSchoolModule() {
+            updateSchoolProgress(100);
+            
+            if (!completedModules.includes('openAdaptationGame')) {
+                completedModules.push('openAdaptationGame');
+                
+                if (!unlockedBadges.includes('badge3')) {
+                    unlockBadge('badge3');
+                    showNotification('🎉 Badge débloqué : Architecte de l\'inclusion !', 'success');
+                }
+                if (!unlockedBadges.includes('badge2')) {
+                    unlockBadge('badge2');
+                    showNotification('🎉 Badge débloqué : Médiateur bienveillant !', 'success');
+                }
+            }
+            
+            // Message personnalisé selon la performance
+            let finalMessage = `🏆 Félicitations ! Vous avez terminé tous les scénarios de l'École Inclusive. `;
+            if (correctAnswersCount === scenarios.length) {
+                finalMessage += "Score parfait ! Vous êtes un·e expert·e de l'inclusion !";
+                updateScore(500); // Bonus pour score parfait
+            } else if (correctAnswersCount >= scenarios.length * 0.7) {
+                finalMessage += "Excellent travail ! Vous maîtrisez les principes de l'inclusion.";
+            } else {
+                finalMessage += "Bon début ! Continuez à pratiquer pour devenir expert·e en inclusion.";
+            }
+            
+            showFeedback(true, finalMessage);
+            
+            // Arrêter le timer
+            if (window.scenarioTimer) {
+                clearInterval(window.scenarioTimer);
+            }
+            
+            setTimeout(() => {
+                correctAnswersCount = 0; // Réinitialiser pour la prochaine fois
+                backToModules();
+            }, 5000);
+            
+            saveProgress();
+        }
+
+        function showFeedback(isSuccess, message) {
+            const feedback = document.getElementById('feedback');
+            feedback.className = 'feedback ' + (isSuccess ? 'success' : 'error');
+            feedback.textContent = message;
+            feedback.style.display = 'block';
+        }
+
+        function showCafeFeedback(isSuccess, message) {
+            const feedback = document.getElementById('cafeFeedback');
+            feedback.className = 'feedback ' + (isSuccess ? 'success' : 'error');
+            feedback.textContent = message;
+            feedback.style.display = 'block';
+        }
+
+        function updateScore(points) {
+            score += points;
+            document.getElementById('score').textContent = score;
+            
+            // Vérifier le niveau
+            const newLevel = Math.floor(score / 1000) + 1;
+            if (newLevel > level) {
+                level = newLevel;
+                document.getElementById('playerLevel').textContent = level;
+                showNotification(`🎉 Niveau ${level} atteint !`, 'success');
+                
+                if (level >= 5 && !unlockedBadges.includes('badge5')) {
+                    unlockBadge('badge5');
+                    showNotification('🏆 Badge ultime débloqué : Expert en inclusion !', 'success');
+                }
+            }
+            
+            // Animation du score
+            const scoreElement = document.querySelector('.score');
+            scoreElement.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                scoreElement.style.transform = 'scale(1)';
+            }, 300);
+            
+            saveProgress();
+        }
+
+        function updateSchoolProgress(percent = null) {
+            if (percent) {
+                document.getElementById('schoolProgress').style.width = percent + '%';
+            } else {
+                const progress = ((currentScenarioIndex + 1) / scenarios.length) * 100;
+                document.getElementById('schoolProgress').style.width = progress + '%';
+            }
+        }
+
+        function unlockBadge(badgeId) {
+            const badge = document.getElementById(badgeId);
+            badge.classList.add('unlocked');
+            if (!unlockedBadges.includes(badgeId)) {
+                unlockedBadges.push(badgeId);
+            }
+            saveProgress();
+        }
+
+        function showNotification(message, type = 'info') {
+            // Créer une notification temporaire
+            const notif = document.createElement('div');
+            notif.className = `notification ${type}`;
+            notif.innerHTML = `
+                <span style="font-size: 1.5em;">${type === 'success' ? '✓' : 'ℹ️'}</span>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(notif);
+            
+            setTimeout(() => {
+                notif.style.opacity = '0';
+                setTimeout(() => notif.remove(), 500);
+            }, 3000);
+        }
+
+        // Quiz rapide
+        function showQuickQuiz() {
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('quickQuiz').style.display = 'block';
+            quizCurrentQuestion = 0;
+            quizScore = 0;
+            loadQuizQuestion();
+            startQuizTimer();
+        }
+
+        function loadQuizQuestion() {
+            if (quizCurrentQuestion >= quizQuestions.length) {
+                endQuiz();
+                return;
+            }
+            
+            const question = quizQuestions[quizCurrentQuestion];
+            document.getElementById('questionText').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, i) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-option';
+                div.textContent = option;
+                div.onclick = function() { checkQuizAnswer(this, i === question.correct); };
+                optionsContainer.appendChild(div);
+            });
+        }
+
+        function checkQuizAnswer(element, isCorrect) {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(o => o.onclick = null);
+            
+            if (isCorrect) {
+                element.style.background = '#e8f5e9';
+                element.style.borderColor = '#4caf50';
+                quizScore++;
+            } else {
+                element.style.background = '#ffebee';
+                element.style.borderColor = '#f44336';
+            }
+            
+            setTimeout(() => {
+                quizCurrentQuestion++;
+                loadQuizQuestion();
+            }, 1000);
+        }
+
+        function startQuizTimer() {
+            let timeLeft = 30;
+            const timerElement = document.getElementById('quizTimer');
+            
+            quizTimer = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = timeLeft;
+                
+                if (timeLeft <= 10) {
+                    timerElement.style.color = '#f44336';
+                }
+                
+                if (timeLeft <= 0) {
+                    endQuiz();
+                }
+            }, 1000);
+        }
+
+        function endQuiz() {
+            clearInterval(quizTimer);
+            document.getElementById('quizQuestion').style.display = 'none';
+            document.getElementById('quizResults').style.display = 'block';
+            
+            document.getElementById('quizScore').textContent = quizScore + '/' + quizQuestions.length;
+            
+            let message = '';
+            if (quizScore === quizQuestions.length) {
+                message = 'Parfait ! Vous êtes un expert des TND !';
+                updateScore(200);
+            } else if (quizScore >= quizQuestions.length * 0.7) {
+                message = 'Très bien ! Vous avez de bonnes connaissances.';
+                updateScore(100);
+            } else {
+                message = 'Continuez à apprendre, vous progressez !';
+                updateScore(50);
+            }
+            
+            document.getElementById('quizMessage').textContent = message;
+        }
+
+        function restartQuiz() {
+            document.getElementById('quizResults').style.display = 'none';
+            document.getElementById('quizQuestion').style.display = 'block';
+            document.getElementById('quizTimer').style.color = '#667eea';
+            showQuickQuiz();
+        }
+
+        // Fonction pour afficher les infos de développement
+        function showDevInfo() {
+            const devContent = `
+                <h3>🎮 État du développement - Parcours TND</h3>
+                
+                <h4>✅ Ce qui a été implémenté :</h4>
+                <ul>
+                    <li><strong>4 modules jouables :</strong> Maison des Découvertes, École Inclusive, Café des Parents, Atelier des Solutions</li>
+                    <li><strong>Système de progression :</strong> Sauvegarde locale, niveaux, score XP</li>
+                    <li><strong>5 badges à débloquer :</strong> Chacun récompense un aspect de l'apprentissage</li>
+                    <li><strong>Quiz rapide :</strong> Mode de jeu alternatif avec timer</li>
+                    <li><strong>Tableau de bord :</strong> Statistiques et accomplissements</li>
+                    <li><strong>Centre de ressources :</strong> Documents téléchargeables simulés</li>
+                    <li><strong>Mode sombre :</strong> Pour le confort visuel</li>
+                    <li><strong>6 troubles couverts :</strong> TSA, TDAH, DYS, DI, Moteurs, Communication</li>
+                </ul>
+                
+                <h4>🔧 Ce qu'on peut faire maintenant :</h4>
+                <ul>
+                    <li>Explorer tous les modules pour apprendre sur les TND</li>
+                    <li>Gagner des badges et monter en niveau</li>
+                    <li>Consulter les ressources pédagogiques</li>
+                    <li>Tester ses connaissances avec le quiz</li>
+                    <li>Sauvegarder sa progression et reprendre plus tard</li>
+                </ul>
+                
+                <h4>💡 Ce qu'on pourrait ajouter :</h4>
+                <ul>
+                    <li><strong>Mode collaboratif :</strong> Permettre à plusieurs formateurs de jouer ensemble</li>
+                    <li><strong>Certificats :</strong> Générer des attestations de formation</li>
+                    <li><strong>Défis quotidiens :</strong> Nouveaux scénarios chaque jour</li>
+                    <li><strong>Vidéos intégrées :</strong> Témoignages et tutoriels</li>
+                    <li><strong>Forum communautaire :</strong> Échanger entre formateurs</li>
+                    <li><strong>Export PDF :</strong> Créer des fiches pratiques personnalisées</li>
+                    <li><strong>Mode hors-ligne :</strong> Application téléchargeable</li>
+                    <li><strong>Personnalisation avatar :</strong> Créer son personnage</li>
+                    <li><strong>Statistiques détaillées :</strong> Graphiques de progression</li>
+                    <li><strong>API backend :</strong> Pour synchroniser entre appareils</li>
+                </ul>
+                
+                <h4>📊 Statistiques techniques :</h4>
+                <ul>
+                    <li>Plus de 2000 lignes de code</li>
+                    <li>5 mini-jeux différents</li>
+                    <li>30+ scénarios pédagogiques</li>
+                    <li>Responsive design mobile/desktop</li>
+                    <li>Aucune dépendance externe</li>
+                </ul>
+                
+                <p style="margin-top: 20px; font-style: italic;">
+                    Ce jeu sérieux a été conçu pour former les professionnels de l'éducation 
+                    aux troubles du neurodéveloppement de manière ludique et engageante.
+                </p>
+            `;
+            
+            document.getElementById('popupTitle').textContent = 'Informations de développement';
+            document.getElementById('popupContent').innerHTML = devContent;
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('infoPopup').style.display = 'block';
+            
+            // Modifier les boutons pour cette popup spéciale
+            const actionButtons = document.querySelector('.action-buttons');
+            actionButtons.innerHTML = '<button class="btn btn-primary" onclick="closePopup()">Fermer</button>';
+        }
+
+        // Initialisation
+        window.onload = function() {
+            // Charger la progression si elle existe
+            if (localStorage.getItem('tndGameProgress')) {
+                const savedData = JSON.parse(localStorage.getItem('tndGameProgress'));
+                if (savedData.score > 0) {
+                    // Proposer de continuer ou recommencer
+                    const continueGame = confirm('Une partie sauvegardée a été trouvée. Voulez-vous continuer ?');
+                    if (!continueGame) {
+                        localStorage.removeItem('tndGameProgress');
+                    }
+                }
+            }
+        };
+    </script>
+</body>
+</html>
